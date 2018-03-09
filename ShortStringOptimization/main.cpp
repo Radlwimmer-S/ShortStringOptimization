@@ -15,7 +15,8 @@ class String
 public:
 #endif // defined(DEBUG)
 
-	static const size_t MAX_SHORT_STRING_LENGTH = sizeof(char*) + sizeof(size_t) - sizeof(uint32_t) - 1;
+	//sizeof(String) - sizeof(SSO::length) - sizeof( '\0' )
+	static const size_t MAX_SHORT_STRING_LENGTH = (sizeof(char*) + sizeof(size_t)) - sizeof(uint32_t) - 1;
 
 	union SSO
 	{
