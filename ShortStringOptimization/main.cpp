@@ -206,79 +206,87 @@ int main(void)
 
 	std::cout << "Testing String-SSO!" << std::endl << std::endl;
 
-	//
 
-	String string(raw);
-	String::SSO sso(&string);
+	{
+		String string(raw);
+		String::SSO sso(&string);
 
-	assert("'explicit String(const char* str)' failed to copy string as SSO!" && strcmp(sso.shortString->string, raw) == 0);
-	assert("'explicit String(const char* str)' failed to set length correctly!" && string.GetLength() == rawLenght);
-	assert("'explicit String(const char* str)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(string.c_str()) == reinterpret_cast<uintptr_t>(sso.shortString->string));
+		assert("'explicit String(const char* str)' failed to copy string as SSO!" && strcmp(sso.shortString->string, raw) == 0);
+		assert("'explicit String(const char* str)' failed to set length correctly!" && string.GetLength() == rawLenght);
+		assert("'explicit String(const char* str)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(string.c_str()) == reinterpret_cast<uintptr_t>(sso.shortString->string));
 
-	std::cout << "'explicit String(const char* str)' works!" << std::endl;
+		std::cout << "'explicit String(const char* str)' works!" << std::endl;
+	}
 
-	//
+	{
+		String string(raw);
+		String copy(string);
+		String::SSO ssoCopy(&copy);
 
-	String copy(string);
-	String::SSO ssoCopy(&copy);
+		assert("'String(const String& other)' failed to copy string as SSO!" && strcmp(string.c_str(), copy.c_str()) == 0);
+		assert("'String(const String& other)' failed to set length correctly!" && copy.GetLength() == string.GetLength());
+		assert("'String(const String& other)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(copy.c_str()) == reinterpret_cast<uintptr_t>(ssoCopy.shortString->string));
 
-	assert("'String(const String& other)' failed to copy string as SSO!" && strcmp(string.c_str(), copy.c_str()) == 0);
-	assert("'String(const String& other)' failed to set length correctly!" && copy.GetLength() == string.GetLength());
-	assert("'String(const String& other)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(copy.c_str()) == reinterpret_cast<uintptr_t>(ssoCopy.shortString->string));
+		std::cout << "'String(const String& other)' works!" << std::endl;
+	}
 
-	std::cout << "'String(const String& other)' works!" << std::endl;
+	{
+		String concat("");
+		concat.Concatenate(raw);
+		String::SSO ssoConcat(&concat);
 
-	//
+		assert("'void String::Concatenate(const char* str)' failed to copy string as SSO!" && strcmp(concat.c_str(), raw) == 0);
+		assert("'void String::Concatenate(const char* str)' failed to set length correctly!" && concat.GetLength() == rawLenght);
+		assert("'void String::Concatenate(const char* str)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(concat.c_str()) == reinterpret_cast<uintptr_t>(ssoConcat.shortString->string));
 
-	String concat("");
-	String::SSO ssoConcat(&concat);
-	concat.Concatenate(raw);
+		std::cout << "'void String::Concatenate(const char* str)' works!" << std::endl;
+	}
 
-	assert("'void String::Concatenate(const char* str)' failed to copy string as SSO!" && strcmp(concat.c_str(), raw) == 0);
-	assert("'void String::Concatenate(const char* str)' failed to set length correctly!" && concat.GetLength() == rawLenght);
-	assert("'void String::Concatenate(const char* str)' failed to store as SSO!" && reinterpret_cast<uintptr_t>(concat.c_str()) == reinterpret_cast<uintptr_t>(ssoConcat.shortString->string));
 
-	std::cout << "'void String::Concatenate(const char* str)' works!" << std::endl;
-
-	//
-
-	uint32_t raw2Lenght2 = 2 * String::MAX_SHORT_STRING_LENGTH;
-	char* raw2 = new char[raw2Lenght2 + 1];
-	raw2[raw2Lenght2] = '\0';
-	_strset_s(raw2, raw2Lenght2 + 1, 'a');
+	uint32_t raw2Lenght = 2 * String::MAX_SHORT_STRING_LENGTH;
+	char* raw2 = new char[raw2Lenght + 1];
+	raw2[raw2Lenght] = '\0';
+	_strset_s(raw2, raw2Lenght + 1, 'a');
 
 	std::cout << std::endl << "Testing String-HeapAlloc!" << std::endl << std::endl;
 
 	//
+	{
+		String concat(raw);
+		concat.Concatenate(raw);
+		String::SSO ssoConcat(&concat);
 
-	concat.Concatenate(raw);
+		assert("'void String::Concatenate(const char* str)' failed to copy string to heap!" && strcmp(concat.c_str(), raw2) == 0);
+		assert("'void String::Concatenate(const char* str)' failed set length correctly!" && concat.GetLength() == raw2Lenght);
+		assert("'void String::Concatenate(const char* str)' failed to store on heap!" && reinterpret_cast<uintptr_t>(concat.c_str()) != reinterpret_cast<uintptr_t>(ssoConcat.shortString->string));
 
-	assert("'void String::Concatenate(const char* str)' failed to copy string to heap!" && strcmp(concat.c_str(), raw2) == 0);
-	assert("'void String::Concatenate(const char* str)' failed set length correctly!" && concat.GetLength() == raw2Lenght2);
-	assert("'void String::Concatenate(const char* str)' failed to store on heap!" && reinterpret_cast<uintptr_t>(concat.c_str()) != reinterpret_cast<uintptr_t>(ssoConcat.shortString->string));
+		std::cout << "'void String::Concatenate(const char* str)' works!" << std::endl;
+	}
 
-	std::cout << "'void String::Concatenate(const char* str)' works!" << std::endl;
+	{
+		String string(raw2);
+		String assign("");
+		assign = string;
+		String::SSO ssoAssign(&assign);
 
-	//
+		assert("'String& operator=(const String& other)' failed to copy string!" && strcmp(string.c_str(), assign.c_str()) == 0);
+		assert("'String& operator=(const String& other)' failed set length correctly!" && string.GetLength() == assign.GetLength());
+		assert("'String& operator=(const String& other)' failed to store on heap!" && reinterpret_cast<uintptr_t>(assign.c_str()) != reinterpret_cast<uintptr_t>(ssoAssign.shortString->string));
 
-	copy = concat;
+		std::cout << "'String& operator=(const String& other)' works!" << std::endl;
+	}
 
-	assert("'String& operator=(const String& other)' failed to copy string!" && strcmp(concat.c_str(), copy.c_str()) == 0);
-	assert("'String& operator=(const String& other)' failed set length correctly!" && concat.GetLength() == copy.GetLength());
-	assert("'String& operator=(const String& other)' failed to store on heap!" && reinterpret_cast<uintptr_t>(copy.c_str()) != reinterpret_cast<uintptr_t>(ssoCopy.shortString->string));
+	{
+		String string(raw2);
+		String copy(string);
+		String::SSO ssoCopy(&copy);
 
-	std::cout << "'String& operator=(const String& other)' works!" << std::endl;
+		assert("'String(const String& other)' failed to copy string!" && strcmp(string.c_str(), copy.c_str()) == 0);
+		assert("'String(const String& other)' failed set length correctly!" && string.GetLength() == copy.GetLength());
+		assert("'String(const String& other)' failed to store on heap!" && reinterpret_cast<uintptr_t>(copy.c_str()) != reinterpret_cast<uintptr_t>(ssoCopy.shortString->string));
 
-	//
-
-	String copy2(copy);
-	String::SSO ssoCopy2(&copy2);
-
-	assert("'String(const String& other)' failed to copy string!" && strcmp(copy2.c_str(), copy.c_str()) == 0);
-	assert("'String(const String& other)' failed set length correctly!" && copy2.GetLength() == copy.GetLength());
-	assert("'String(const String& other)' failed to store on heap!" && reinterpret_cast<uintptr_t>(copy2.c_str()) != reinterpret_cast<uintptr_t>(ssoCopy2.shortString->string));
-
-	std::cout << "'String(const String& other)' works!" << std::endl;
+		std::cout << "'String(const String& other)' works!" << std::endl;
+	}
 
 	std::cout << std::endl << "Everything works!" << std::endl;
 }
