@@ -11,14 +11,14 @@
 
 //  struct ShortString Data-Layout
 //  +-----------+--------+----------------+--------+
-//  |   1 Bit   |  7 Bit | 6 bzw. 14 Byte | 1 Byte |
+//  |  LSB = 1  |  7 Bit | 6 bzw. 14 Byte | 1 Byte |
 //  | IsSS-Flag | length |     string     |  '\0'  |
 //  +-----------+--------+----------------+--------+
 //  
 //  class String Data-Layout
 //  +-----------+--------------------+-------------+
-//  | ( LSB = 0 )         char*      |    size_t   |
-//  | (2 aligned)       m_string     |   m_length  |
+//  |  LSB = 0            char*      |    size_t   |
+//  | 2 aligned ptr     m_string     |   m_length  |
 //  +-----------+--------------------+-------------+
 //						   |
 //						   |		+-----------+----------------+--------+-----------+
