@@ -31,6 +31,8 @@ class String
 #if defined(_DEBUG)
 public:
 #endif // defined(DEBUG)
+
+	// sizeof(String) - 1 Byte (SSO Meta Data) - 1 Byte ( '\0' )
 	static const size_t MAX_SHORT_STRING_LENGTH = (sizeof(char*) + sizeof(size_t)) - 2;
 
 	union SSO
@@ -61,7 +63,7 @@ public:
 		{
 			m_string = Clone(str, length);
 			m_length = length;
-			sso.shortString->isShortString = 0;
+			assert("'char* m_string' must be 2 aligned!" && sso.shortString->isShortString == 0);
 		}
 	}
 
@@ -160,6 +162,9 @@ private:
 	{
 		assert("Given string may not be null" && (str != nullptr));
 
+		if (otherLength == 0)
+			return;
+
 		const size_t thisLength = GetLength();
 		const size_t newLength = thisLength + otherLength;
 
@@ -182,7 +187,7 @@ private:
 
 			m_string = newString;
 			m_length = newLength;
-			sso.shortString->isShortString = 0;
+			assert("'char* m_string' must be 2 aligned!" && sso.shortString->isShortString == 0);
 		}
 	}
 
@@ -193,11 +198,11 @@ private:
 
 	static char* GetAlignedMemory(size_t length)
 	{
-		char* aligned = new char[length + 3u]; //+1 for '\0'; +1 for alignment; +1 to safe alignmentOffset
+		char* aligned = new char[length + 3u]; //+1 for '\0'; +1 for alignment; +1 to store alignmentOffset
 
-		const uintptr_t cloneAdress = reinterpret_cast<uintptr_t>(aligned);
+		const uintptr_t alignedAdress = reinterpret_cast<uintptr_t>(aligned);
 
-		if (cloneAdress & 1)
+		if (alignedAdress & 1)
 		{
 			++aligned;
 			GetAlignmentFlag(aligned, length) = 1;
@@ -340,5 +345,5 @@ int main(void)
 #endif
 	}
 
-	std::cout << std::endl << "Everything works!" << std::endl;
+	std::cout << std::endl << "Everything works!" << std::endl << std::endl;
 }
