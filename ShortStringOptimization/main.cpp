@@ -9,6 +9,23 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+//  struct ShortString Data-Layout
+//  +-----------+--------+----------------+--------+
+//  |   1 Bit   |  7 Bit | 6 bzw. 14 Byte | 1 Byte |
+//  | IsSS-Flag | length |     string     |  '\0'  |
+//  +-----------+--------+----------------+--------+
+//  
+//  class String Data-Layout
+//  +-----------+--------------------+-------------+
+//  | ( LSB = 0 )         char*      |    size_t   |
+//  | (2 aligned)       m_string     |   m_length  |
+//  +-----------+--------------------+-------------+
+//						   |
+//						   |		+-----------+----------------+--------+-----------+
+//						   +------->|  0-1 Byte | char[m_length] | 1 Byte |  0-1 Byte |
+//						    		| Alignment |   raw string   |  '\0'  |    Empty  |
+//						    		+-----------+----------------+--------+-----------+
+
 class String
 {
 #if defined(_DEBUG)
