@@ -17,6 +17,10 @@
 // #  -) 1 bit as SSO-Flag (SSO)							  |   MSB	| Empty	|     length    |   LSB   |	#
 // #  -) 4 bits as inversed length (L)						  | SSO(LE) | 0 | 0 | L | L | L | L | SSO(BE) |	#
 // # 														  +---------+---+---+---+---+---+---+---------+	#
+// #  Properties:																							#
+// #  -) Works with big endian and little endian (via compiler flag)										#
+// #  -) Max heap string length is size_t																	#
+// #  -) Max short stirng length is sizeof(String) - 1														#
 // # 																										#
 // ##########################################################################################################
 
